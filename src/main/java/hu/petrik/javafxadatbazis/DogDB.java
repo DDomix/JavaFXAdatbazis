@@ -22,8 +22,8 @@ public class DogDB {
         String sql = "INSERT INTO dogs (name, age, breed) VALUES (?,?,?)";
         PreparedStatement stat = conn.prepareStatement(sql);
         stat.setString(1, dog.getName());
-        stat.setInt(1, dog.getAge());
-        stat.setString(1, dog.getBreed());
+        stat.setInt(2, dog.getAge());
+        stat.setString(3, dog.getBreed());
         return stat.executeUpdate() > 0;
     }
 
@@ -47,7 +47,10 @@ public class DogDB {
 
     }
 
-    public void deleteDogs() {
-
+    public boolean deleteDogs(int id) throws SQLException {
+        String sql="DELETE FROM dogs WHERE id = ?";
+        PreparedStatement  stat =conn.prepareStatement(sql);
+        stat.setInt(1,id);
+        return stat.executeUpdate()>0;
     }
 }
