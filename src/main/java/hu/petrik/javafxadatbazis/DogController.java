@@ -35,8 +35,7 @@ public class DogController {
     @FXML
     private Spinner<Integer> ageInput;
 
-    @Deprecated
-    private void initialize(){
+    public void initialize(){
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         ageCol.setCellValueFactory(new PropertyValueFactory<>("age"));
         breedCol.setCellValueFactory(new PropertyValueFactory<>("breed"));
@@ -46,10 +45,14 @@ public class DogController {
             readDogs();
         }catch (SQLException e){
             Platform.runLater(()->{
-                alert(Alert.AlertType.ERROR,"hiba történt az adatbáziskapcsolat kialakításakor",e.getMessage());
+                SQLAlert(e);
                 Platform.exit();
             });
         }
+    }
+
+    private void SQLAlert(SQLException e) {
+        alert(Alert.AlertType.ERROR,"Hiba történt az adatbáziskapcsolat kialakításakor",e.getMessage());
     }
 
     private void readDogs() throws SQLException {
@@ -67,7 +70,34 @@ public class DogController {
 
     @FXML
     public void submitClick(ActionEvent actionEvent) {
+        String name=nameInput.getText().trim();
+        int age=ageInput.getValue();
+        String breed=breedInput.getText().trim();
+        if (name.isEmpty()){
+            alert(Alert.AlertType.WARNING, "Név megadása kötelező","");
+            return;
+        }
+        if (breed.isEmpty()){
+            alert(Alert.AlertType.WARNING, "Fajta megadása kötelező","");
+            return;
+        }
+        Dog dog =new Dog(name,age,breed);
+        try {
+            if (db.createDog(dog)) {
+                alert(Alert.AlertType.WARNING,"Sikeres felvétel","");
+                resetform();
+            } else {
+                alert(Alert.AlertType.WARNING,"Sikertelen felvétel","");
+            }
+        } catch (SQLException e) {
+            SQLAlert(e);
+        }
+    }
 
+    private void resetform() {
+        nameInput.setText("");
+        breedInput.setText("");
+        ageInput.getValueFactory().setValue(0);
     }
 
     @FXML
